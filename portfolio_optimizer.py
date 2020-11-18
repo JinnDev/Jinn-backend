@@ -9,11 +9,11 @@ from data_source import (
 )
 
 map_risk_level_to_vol = {
-    "1" : 0.12,
-    "2": 0.17,
-    "3": 0.23,
-    "4": 0.28,
-    "5": 0.33
+    "0" : 0.12,
+    "1": 0.17,
+    "2": 0.23,
+    "3": 0.28,
+    "4": 0.33
 }
 
 def calculate_covariance_matrix(prices):
