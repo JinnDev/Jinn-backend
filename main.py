@@ -15,6 +15,18 @@ from nosql_db_accessor import (
     delete_subscription
 )
 
+from portfolio_optimizer import (
+    calculate_portfolio
+)
+
+from data_source import (
+    get_historical_prices_close
+)
+
+from utils import (
+    parse_weights
+)
+
 # from flask import Flask, render_template, jsonify, request, send_from_directory, redirect
 app = Flask(__name__)
 cors = CORS(app)
@@ -22,7 +34,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Set your secret key. Remember to switch to your live secret key in production!
 # See your keys here: https://dashboard.stripe.com/account/apikeys
-stripe.api_key = 'sk_test_51HeN8eH4w9X1EWMYc1gRVyPgI7Dm9j6wjAyEKPJMzBohyIk2Yu3v8NVpFUYAxw595JioVs8uf15rdu5F87Dqstna00HmgQhF30'
+stripe.api_key = 'cd '
 
 @app.route('/')
 def root():
@@ -31,6 +43,46 @@ def root():
 
     # Fetch the most recent 10 access times from Datastore.
     return get_all_customers()
+
+"""
+############ Application #############
+"""
+@app.route('/get-portfolio', methods=["GET"])
+@cross_origin()
+def get_portfolio():
+    try:
+        risk_level = request.args.get('riskLevel')
+
+        stock_universe = ["MSFT", "AMZN", "KO", "MA", "COST",
+                          "LUV", "XOM", "PFE", "JPM", "UNH",
+                          "ACN", "DIS", "GILD", "F", "TSLA"]
+
+        security_information = {
+            "MSFT" : { "name": "ACN firm", "type": "EQUITY" },
+            "AMZN" : { "name": "ACN firm", "type": "EQUITY" },
+            "KO" : { "name": "ACN firm", "type": "EQUITY" },
+            "MA" : { "name": "ACN firm", "type": "EQUITY" },
+            "COST" : { "name": "ACN firm", "type": "EQUITY" },
+            "LUV" : { "name": "ACN firm", "type": "EQUITY" },
+            "PFE" : { "name": "ACN firm", "type": "EQUITY" },
+            "JPM" : { "name": "ACN firm", "type": "EQUITY" },
+            "UNH" : { "name": "ACN firm", "type": "EQUITY" },
+            "ACN" : { "name": "ACN firm", "type": "EQUITY" },
+            "DIS" : { "name": "ACN firm", "type": "EQUITY" },
+            "GILD" : { "name": "ACN firm", "type": "EQUITY" },
+            "F" : { "name": "ACN firm", "type": "EQUITY" },
+            "TSLA" : { "name": "ACN firm", "type": "EQUITY" },
+            "XOM" : { "name": "ACN firm", "type": "EQUITY" },
+        }
+
+        prices = get_historical_prices_close(stock_universe)
+        weights = calculate_portfolio(prices, risk_level)
+
+        portfolio = parse_weights(weights, security_information)
+        return jsonify(portfolio), 200
+    except:
+        logging.exception("message")
+        return jsonify({'status': 'failure'}), 400
 
 """
 ############ Stripe #############
@@ -94,7 +146,6 @@ def cancel_subscription():
 def webhook_received():
     # You can use webhooks to receive information about asynchronous payment events.
     # For more about our webhook events check out https://stripe.com/docs/webhooks.
-    # webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
     webhook_secret = 'whsec_phTbXiZIQeBOoyONRkEucUkmSaDIqzZn' # I copied this from the command line when pairing the CLI with my account
 
     try:
