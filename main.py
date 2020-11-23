@@ -52,7 +52,7 @@ def root():
 @cross_origin()
 def get_portfolio():
     try:
-        risk_level = request.args.get('riskLevel')
+        risk_level = int(request.args.get('riskLevel'))
         securities = get_security_universe()
         prices = get_historical_prices_close(list(securities.keys()))
         weights = calculate_portfolio(prices, risk_level)

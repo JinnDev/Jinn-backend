@@ -41,7 +41,7 @@ security_information = {
     "USHY" : { "name": "iShares Broad USD High Yield Corporate Bond ETF", "type": "CMDTY" },
 
     # EM Bonds
-    "EMB" : { "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF", "type": "EM BONDS" },
+    "EMB" : { "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF", "type": "EM BONDS" }
 }
 
 
