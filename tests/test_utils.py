@@ -16,9 +16,6 @@ def test_parse_weights():
     ]
     # WHEN
     result = parse_weights(weights, tickers)
-    print(result)
+
     # THEN
     assert result == expected_result
-    # assert result["AMZN"] == expected_result["AMZN"]
-    # assert result["ACN"] == expected_result["ACN"]
-    # assert result["DIS"] == expected_result["DIS"]

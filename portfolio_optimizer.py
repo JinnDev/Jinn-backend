@@ -4,10 +4,6 @@ from pypfopt import (
     EfficientFrontier
 )
 
-from data_source import (
-    get_historical_prices_close
-)
-
 map_risk_level_to_vol = {
     "0" : 0.12,
     "1": 0.17,

@@ -20,7 +20,8 @@ from portfolio_optimizer import (
 )
 
 from data_source import (
-    get_historical_prices_close
+    get_historical_prices_close,
+    get_security_universe
 )
 
 from utils import (
@@ -45,28 +46,6 @@ def root():
     return get_all_customers()
 
 """
-############ GLOBAL VARIABLES #############
-"""
-security_information = {
-    "^GSPC" : { "name": "S&P 500", "type": "EQUITY" },
-    "^DJI" : { "name": "Dow 30", "type": "EQUITY" },
-    "^FTSE" : { "name": "FTSE 100", "type": "EQUITY" },
-    "^GDAXI" : { "name": "DAX Performance-Index", "type": "EQUITY" },
-    "^FCHI" : { "name": "CAC 40", "type": "EQUITY" },
-    "^N225" : { "name": "Nikkei 225", "type": "EQUITY" },
-    "^HSI" : { "name": "HANG SENG INDEX", "type": "EQUITY" },
-
-    # "^RUT" : { "name": "Russell 2000", "type": "EQUITY" },
-    # "^STOXX50E" : { "name": "ESTX 50 PR.EUR", "type": "EQUITY" },
-    # "^AXJO" : { "name": "S&P/ASX 200", "type": "EQUITY" },
-    # "^KS11" : { "name": "KOSPI Composite Index", "type": "EQUITY" },
-    # "^JKSE" : { "name": "Jakarta Composite Index", "type": "EQUITY" },
-    # "^BVSP" : { "name": "IBOVESPA", "type": "EQUITY" },
-}
-
-
-
-"""
 ############ APPLICATION #############
 """
 @app.route('/get-portfolio', methods=["GET"])
@@ -74,10 +53,11 @@ security_information = {
 def get_portfolio():
     try:
         risk_level = request.args.get('riskLevel')
-        prices = get_historical_prices_close(list(security_information.keys()))
+        securities = get_security_universe()
+        prices = get_historical_prices_close(list(securities.keys()))
         weights = calculate_portfolio(prices, risk_level)
 
-        portfolio = parse_weights(weights, security_information)
+        portfolio = parse_weights(weights, securities)
         return jsonify(portfolio), 200
     except:
         logging.exception("message")
