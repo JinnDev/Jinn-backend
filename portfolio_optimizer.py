@@ -11,6 +11,9 @@ def calculate_covariance_matrix(prices):
 def calculate_expected_capm_returns(prices):
     return expected_returns.capm_return(prices)
 
+def calculate_historical_volatilities(prices):
+    return {sec:prices[sec].std(skipna=True) for sec in prices.columns.values}
+    
 def calculate_portfolio(prices, risk_level):
     cov_matrix = calculate_covariance_matrix(prices)
     expected_returns = calculate_expected_capm_returns(prices)
@@ -20,13 +23,14 @@ def calculate_portfolio(prices, risk_level):
     ef.min_volatility()
     expected_return_min_vol, min_vol, sharpe_ratio_min_vol = ef.portfolio_performance()
 
-    # Get the max vol
+    # Get max vol
     ef.efficient_risk(1)
     expected_return_max_vol, max_vol, sharpe_ratio_max_vol = ef.portfolio_performance()
 
     target_volatility = min_vol + (risk_level / 5) * (max_vol * 0.75 - min_vol)
     ef.efficient_risk(target_volatility)
     weights = ef.clean_weights()
+
     return weights
 
 # prices = get_historical_prices_close(tickers)

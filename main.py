@@ -17,7 +17,8 @@ from nosql_db_accessor import (
 )
 
 from portfolio_optimizer import (
-    calculate_portfolio
+    calculate_portfolio,
+    calculate_historical_volatilities
 )
 
 from data_source import (
@@ -58,9 +59,9 @@ def get_portfolio():
         risk_level = int(request.args.get('riskLevel'))
         securities = get_security_universe()
         prices = get_historical_prices_close(list(securities.keys()))
+        historical_vols = calculate_historical_volatilities(prices)
         weights = calculate_portfolio(prices, risk_level)
-
-        portfolio = parse_weights(weights, securities)
+        portfolio = parse_weights(weights, securities, historical_vols)
         return jsonify(portfolio), 200
     except:
         logging.exception("message")
