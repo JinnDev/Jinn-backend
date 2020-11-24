@@ -4,6 +4,7 @@ import json
 import datetime
 import logging
 from flask_cors import CORS, cross_origin
+from dotenv import load_dotenv
 
 from flask import Flask, jsonify, request
 
@@ -28,6 +29,8 @@ from utils import (
     parse_weights
 )
 
+load_dotenv()
+
 # from flask import Flask, render_template, jsonify, request, send_from_directory, redirect
 app = Flask(__name__)
 cors = CORS(app)
@@ -35,7 +38,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Set your secret key. Remember to switch to your live secret key in production!
 # See your keys here: https://dashboard.stripe.com/account/apikeys
-stripe.api_key = 'cd '
+stripe.api_key = os.environ.get("STRIPE_API_KEY")
 
 @app.route('/')
 def root():

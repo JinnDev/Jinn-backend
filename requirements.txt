@@ -34,3 +34,4 @@ Werkzeug==1.0.1
 yfinance
 scikit-learn
 pytest
+python-dotenv
