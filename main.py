@@ -67,6 +67,52 @@ def get_portfolio():
         logging.exception("message")
         return jsonify({'status': 'failure'}), 400
 
+@app.route('/get-backtest', methods=["GET"])
+@cross_origin()
+def get_backtest():
+    try:
+        data = [
+          {
+            "date": "20/11/2020",
+            "value": 100,
+          },
+          {
+            "date": "21/11/2020",
+            "value": 101,
+          },
+          {
+            "date": "22/11/2020",
+            "value": 102,
+          },
+          {
+            "date": "23/11/2020",
+            "value": 104,
+          },
+          {
+            "date": "24/11/2020",
+            "value": 99,
+          },
+          {
+            "date": "25/11/2020",
+            "value": 101,
+          },
+          {
+            "date": "26/11/2020",
+            "value": 105,
+          },
+          {
+            "date": "27/11/2020",
+            "value": 106,
+          },
+          {
+            "date": "28/11/2020",
+            "value": 106,
+          }]
+        return jsonify(data), 200
+    except:
+        logging.exception("message")
+        return jsonify({'status': 'failure'}), 400
+
 """
 ############ Stripe #############
 """

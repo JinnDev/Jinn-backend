@@ -44,10 +44,8 @@ security_information = {
     "EMB" : { "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF", "type": "EM BONDS" }
 }
 
-
 def get_security_universe():
     return security_information
-
 
 def get_historical_prices_close(tickers):
     ohlc = yf.download(tickers, period="max")
