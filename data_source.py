@@ -44,9 +44,18 @@ security_information = {
     "EMB" : { "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF", "type": "EM BONDS" }
 }
 
+benchmark_information = {
+    "ticker": "^GSPC",
+    "name": "S&P 500 Index",
+    "type": "EQUITY"
+}
+
 def get_security_universe():
     return security_information
 
 def get_historical_prices_close(tickers):
     ohlc = yf.download(tickers, period="max")
     return ohlc["Adj Close"]
+
+def get_benchmark():
+    return benchmark_information

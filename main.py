@@ -5,6 +5,7 @@ import datetime
 import logging
 from flask_cors import CORS, cross_origin
 from dotenv import load_dotenv
+from collections import OrderedDict
 
 from flask import Flask, jsonify, request
 
@@ -23,7 +24,14 @@ from portfolio_optimizer import (
 
 from data_source import (
     get_historical_prices_close,
-    get_security_universe
+    get_security_universe,
+    get_benchmark
+)
+
+from backtest import (
+    calculate_backtest_prices,
+    back_test_prices_to_json,
+    calculate_backtest_performance
 )
 
 from utils import (
@@ -56,62 +64,24 @@ def root():
 @cross_origin()
 def get_portfolio():
     try:
+        # 1. Calculate portfolio
         risk_level = int(request.args.get('riskLevel'))
         securities = get_security_universe()
         prices = get_historical_prices_close(list(securities.keys()))
         historical_vols = calculate_historical_volatilities(prices)
         weights = calculate_portfolio(prices, risk_level)
         portfolio = parse_weights(weights, securities, historical_vols)
-        return jsonify(portfolio), 200
+
+        # 2. Do benchmark
+        benchmark = get_benchmark()
+        prices_benchmark = get_historical_prices_close([benchmark["ticker"]])
+        backtest_prices = calculate_backtest_prices(prices, weights, prices_benchmark)
+        backtest_performamce = calculate_backtest_performance(backtest_prices, benchmark["name"])
+        return jsonify({"portfolio": portfolio, "backtest": back_test_prices_to_json(backtest_prices), "backtestPerformance": backtest_performamce}), 200
     except:
         logging.exception("message")
         return jsonify({'status': 'failure'}), 400
 
-@app.route('/get-backtest', methods=["GET"])
-@cross_origin()
-def get_backtest():
-    try:
-        data = [
-          {
-            "date": "20/11/2020",
-            "value": 100,
-          },
-          {
-            "date": "21/11/2020",
-            "value": 101,
-          },
-          {
-            "date": "22/11/2020",
-            "value": 102,
-          },
-          {
-            "date": "23/11/2020",
-            "value": 104,
-          },
-          {
-            "date": "24/11/2020",
-            "value": 99,
-          },
-          {
-            "date": "25/11/2020",
-            "value": 101,
-          },
-          {
-            "date": "26/11/2020",
-            "value": 105,
-          },
-          {
-            "date": "27/11/2020",
-            "value": 106,
-          },
-          {
-            "date": "28/11/2020",
-            "value": 106,
-          }]
-        return jsonify(data), 200
-    except:
-        logging.exception("message")
-        return jsonify({'status': 'failure'}), 400
 
 """
 ############ Stripe #############
