@@ -19,7 +19,8 @@ from nosql_db_accessor import (
 
 from portfolio_optimizer import (
     calculate_portfolio,
-    calculate_historical_volatilities
+    calculate_historical_volatilities,
+    calculate_max_sharpe_portfolio
 )
 
 from data_source import (
@@ -60,23 +61,26 @@ def root():
 """
 ############ APPLICATION #############
 """
-@app.route('/get-portfolio', methods=["GET"])
+@app.route('/post-get-portfolio', methods=["POST"])
 @cross_origin()
-def get_portfolio():
+def post_get_portfolio():
     try:
+        risk_level = request.json["riskLevel"]
+        restrictions = request.json["restrictions"]
+
         # 1. Calculate portfolio
-        risk_level = int(request.args.get('riskLevel'))
         securities = get_security_universe()
+        benchmark = get_benchmark()
         prices = get_historical_prices_close(list(securities.keys()))
+        prices_benchmark = get_historical_prices_close([benchmark["ticker"]])
         historical_vols = calculate_historical_volatilities(prices)
-        weights = calculate_portfolio(prices, risk_level)
+        weights = calculate_portfolio(prices, prices_benchmark, risk_level, restrictions)
         portfolio = parse_weights(weights, securities, historical_vols)
 
         # 2. Do benchmark
-        benchmark = get_benchmark()
-        prices_benchmark = get_historical_prices_close([benchmark["ticker"]])
         backtest_prices = calculate_backtest_prices(prices, weights, prices_benchmark)
         backtest_performamce = calculate_backtest_performance(backtest_prices, benchmark["name"])
+
         return jsonify({"portfolio": portfolio, "backtest": back_test_prices_to_json(backtest_prices), "backtestPerformance": backtest_performamce}), 200
     except:
         logging.exception("message")
