@@ -17,27 +17,35 @@ def calculate_expected_capm_returns(prices, prices_benchmark):
 def calculate_historical_volatilities(prices):
     return {sec:prices[sec].std(skipna=True) for sec in prices.columns.values}
 
-def calculate_portfolio(prices, prices_benchmark, risk_level, restrictions):
+def calculate_portfolio(prices, prices_benchmark, risk_level, restrictions, securities_risk):
     cov_matrix = calculate_covariance_matrix(prices)
-    expected_returns = calculate_expected_capm_returns(prices, prices_benchmark)
-    ef = EfficientFrontier(expected_returns, cov_matrix, weight_bounds=(0, None))
+    ef = EfficientFrontier(None, cov_matrix, weight_bounds=(0, None))
 
     # Add restrictions
     for r in restrictions:
         r_index =  ef.tickers.index(r["ticker"])
         ef.add_constraint(lambda w: w[r_index] == r["weight"])
 
+    # Add risk restriction
+    high_risk_min = (risk_level / 10) / 1.25
+    low_risk_min = (1 - risk_level / 10) / 1.25
+
+    risk_lower = {
+        "High": high_risk_min,
+        "Low": low_risk_min,
+    }
+
+    risk_upper = {
+        "High": high_risk_min + 0.1,
+        "Low": low_risk_min + 0.1,
+    }
+
+    print(risk_lower)
+    print(risk_upper)
+    ef.add_sector_constraints(securities_risk, risk_lower, risk_upper)
+
     # Get min vol
     ef.min_volatility()
-    expected_return_min_vol, min_vol, sharpe_ratio_min_vol = ef.portfolio_performance()
-
-    # Get max vol
-    ef.efficient_risk(1)
-    expected_return_max_vol, max_vol, sharpe_ratio_max_vol = ef.portfolio_performance()
-
-    target_volatility = min_vol + (risk_level / 10) * (max_vol * 0.75 - min_vol)
-    ef.efficient_risk(target_volatility)
-
     weights = ef.clean_weights()
 
     return weights
@@ -51,6 +59,3 @@ def calculate_max_sharpe_portfolio(prices):
     ef.max_sharpe()
     weights = ef.clean_weights()
     return weights
-
-# prices = get_historical_prices_close(tickers)
-# print(calculate_portfolio(prices, 0.15))

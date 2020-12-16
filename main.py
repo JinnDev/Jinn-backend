@@ -26,7 +26,8 @@ from portfolio_optimizer import (
 from data_source import (
     get_historical_prices_close,
     get_security_universe,
-    get_benchmark
+    get_benchmark,
+    get_security_risk
 )
 
 from backtest import (
@@ -70,11 +71,12 @@ def post_get_portfolio():
 
         # 1. Calculate portfolio
         securities = get_security_universe()
+        securities_risk = get_security_risk()
         benchmark = get_benchmark()
         prices = get_historical_prices_close(list(securities.keys()))
         prices_benchmark = get_historical_prices_close([benchmark["ticker"]])
         historical_vols = calculate_historical_volatilities(prices)
-        weights = calculate_portfolio(prices, prices_benchmark, risk_level, restrictions)
+        weights = calculate_portfolio(prices, prices_benchmark, risk_level, restrictions, securities_risk)
         portfolio = parse_weights(weights, securities, historical_vols)
 
         # 2. Do benchmark

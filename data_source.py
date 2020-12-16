@@ -57,8 +57,59 @@ security_information = {
     "EMB" : { "name": "iShares J.P. Morgan USD Emerging Markets Bond ETF", "type": "EM BONDS" }
 }
 
+security_risk_mapping = {
+        # US - Equity
+        "IVV" : "High",
+        "IJH" : "High",
+        "IJR" : "High",
+        "IVE" : "High",
+        "DGRO" : "High",
+        "IYY" : "High",
+
+        # EM - Equity
+        "EEM" : "High",
+        "IEMG" : "High",
+
+        # Europe - Equity
+        "EWG" : "High",
+        "EWU" : "High",
+        "EWQ" : "High",
+        "EIS" : "High",
+        "EWL" : "High",
+
+        # Asia - Equity
+        "EWJ" : "High",
+        "MCHI" : "High",
+        "EWY" : "High",
+        "INDA" : "High",
+        "EWT" : "High",
+
+        # Commodities
+        "IAU" : "High",
+        "SLV" : "High",
+
+        # Treasuries
+        "IEF" : "Low",
+        "IEI" : "Low",
+
+        # Other
+        "MBB" : "Low",
+        "MUB" : "Low",
+        "TLT" : "Low",
+        "MBB" : "Low",
+
+        # Investment grade - US
+        "USIG" : "Low",
+
+        # HY - US
+        "USHY" : "Low",
+
+        # EM Bonds
+        "EMB" : "High",
+}
+
 benchmark_information = {
-    "ticker": "^STOXX50E",
+    "ticker": "^GSPC",
     "name": "EURO STOXX 50 Index",
     "type": "EQUITY"
 }
@@ -71,6 +122,9 @@ benchmark_information = {
 
 def get_security_universe():
     return security_information
+
+def get_security_risk():
+    return security_risk_mapping
 
 def get_historical_prices_close(tickers):
     ohlc = yf.download(tickers, period="max")
